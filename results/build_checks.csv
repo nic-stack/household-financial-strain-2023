@@ -1,0 +1,8 @@
+,value
+interviews,18871.0
+households,10344.0
+interviews with $0 3-month spending,1.0
+interviews with $0 spending using this-quarter column only,6319.0
+interviews with reported income <= 0,1408.0
+interviews with imputed income <= 0,57.0
+max gap between weight total and each replicate total (%),0.0
