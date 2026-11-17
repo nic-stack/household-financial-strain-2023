@@ -37,8 +37,8 @@ finish(fig, "The original 3.5% came from two data errors",
 fig.savefig(C / "01_team_reconciliation.png", dpi=160); plt.close()
 
 # 2. who is housing-cost burdened
-b = pd.read_csv(R / "by_group.csv")
-b = b[b.measure == "burdened"]
+est = pd.read_csv(R / "estimates.csv")
+b = est[est.measure == "burdened"]
 blocks = [("income_quintile", "Income"), ("tenure", "Housing"), ("earners_group", "Earners"),
           ("household_type", "Household"), ("age_group", "Age")]
 rows = []
@@ -46,7 +46,7 @@ for gv, name in blocks:
     sub = b[b.group_var == gv]
     rows.append(("__" + name, None, None, None))
     rows += [(g, p, lo, hi) for g, p, lo, hi in sub[["group", "pct", "ci_low", "ci_high"]].itertuples(index=False)]
-overall = pd.read_csv(R / "headline.csv").set_index("measure").pct["Housing cost burden (>30% of income)"]
+overall = b[b.group_var == "all"].pct.iloc[0]
 fig, ax = plt.subplots(figsize=(10, 9.5)); fig.subplots_adjust(top=.89, bottom=.09, left=.22, right=.97)
 y = list(range(len(rows)))[::-1]
 for yi, (g, p, lo, hi) in zip(y, rows):
@@ -70,7 +70,7 @@ fig.savefig(C / "02_burden_by_group.png", dpi=160); plt.close()
 # 3. where the money goes
 s = pd.read_csv(R / "spending_profile.csv").set_index("group")
 parts = [c for c in s.columns if c.startswith("share_")]
-names = {"share_housing (rent/owner costs + utilities)": "Housing", "share_food": "Food",
+names = {"share_housing": "Housing", "share_food": "Food",
          "share_transportation": "Transport", "share_healthcare": "Healthcare"}
 palette = [ACCENT, SOFT, MUTED, LIGHT]
 order = ["Severely burdened renters", "Other renters", "Severely burdened owners", "Other owners"]

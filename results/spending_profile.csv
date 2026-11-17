@@ -1,4 +1,4 @@
-group,interviews,median_income_before_tax,mean_annual_spending_incl_principal,share_housing (rent/owner costs + utilities),share_food,share_transportation,share_healthcare
+group,interviews,median_income_before_tax,mean_annual_spending_incl_principal,share_housing,share_food,share_transportation,share_healthcare
 Severely burdened renters,1752,19000.0,45440.0,44.4,17.8,13.2,5.2
 Other renters,4267,65000.0,61990.0,29.3,17.0,16.5,5.7
 Severely burdened owners,1173,22000.0,71000.0,37.3,14.0,13.9,8.5

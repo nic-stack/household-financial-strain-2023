@@ -16,6 +16,8 @@ from estimate import share, mean, by_group
 
 ROOT = Path(__file__).resolve().parents[1]
 RES = ROOT / "results"
+CHK = RES / "pandas_check"     # independent pandas version of the SQL results
+CHK.mkdir(exist_ok=True)
 t = pd.read_csv(ROOT / "data" / "processed" / "interviews.csv", low_memory=False)
 
 inc_q = t.income_before_tax / 4
@@ -41,7 +43,7 @@ head = pd.DataFrame([
     {"measure": "Spent more than after-tax income (3 months)", **share(t, "overspend")},
     {"measure": "Spent more than after-tax income, excluding vehicle purchases", **share(t, "overspend_ex_vehicle")},
 ])
-head.round(2).to_csv(RES / "headline.csv", index=False)
+head.round(2).to_csv(CHK / "headline.csv", index=False)
 
 # ---------------------------------------------------------------- 2. by group
 orders = {
@@ -61,7 +63,7 @@ for g, order in orders.items():
                            "overspend_ex_vehicle", g, order).assign(measure="overspend_ex_vehicle"))
 by = pd.concat(groups, ignore_index=True).dropna(subset=["group"])   # drops "region not stated" (suppressed by BLS)
 by = by[["measure", "group_var", "group", "pct", "se_pct", "ci_low", "ci_high", "households_m", "interviews"]]
-by.round(2).to_csv(RES / "by_group.csv", index=False)
+by.round(2).to_csv(CHK / "by_group.csv", index=False)
 
 # ---------------------------------------------------------------- 3. where the money goes
 def weighted_median(x, w):
@@ -85,7 +87,7 @@ for label, sub in [("Severely burdened renters", H[(H.tenure == "Renter") & H.se
                  ("spend_transport", "transportation"), ("spend_health", "healthcare")]:
         r[f"share_{n}"] = round(100 * (sub[c] * w).sum() / tot, 1)
     rows.append(r)
-pd.DataFrame(rows).to_csv(RES / "spending_profile.csv", index=False)
+pd.DataFrame(rows).to_csv(CHK / "spending_profile.csv", index=False)
 
 # ---------------------------------------------------------------- 4. sensitivity: how much do the thresholds matter?
 sens = []
@@ -124,6 +126,6 @@ bench = pd.DataFrame([
 bench.to_csv(RES / "benchmark_acs.csv", index=False)
 
 pd.set_option("display.width", 200)
-for f in ["headline", "validation", "benchmark_acs", "sensitivity_threshold", "spending_profile"]:
+for f in ["validation", "benchmark_acs", "sensitivity_threshold"]:
     print(f"\n== {f}\n", pd.read_csv(RES / f"{f}.csv").to_string(index=False))
 print("\n== by_group\n", by.round(1).to_string(index=False))

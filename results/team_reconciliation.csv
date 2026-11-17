@@ -1,7 +1,7 @@
-step,change,flagged,pct
-0,"Original team method (Apr-Jun 2023, this-quarter spending vs annual reported income)",152 of 4393 interviews,3.46
-1,Add the last-quarter spending columns (3 full months for every household),380 of 4393 interviews,8.65
-2,Compare 3 months of spending with 3 months of income (not 12),2008 of 4393 interviews,45.71
-3,Use imputed income (keeps households that did not report income),1960 of 4736 interviews,41.39
-4,Apply survey weights (estimate for all U.S. households),54.5M US households,40.67
-5,Use all four 2023 interview files (full year),54.7M US households,40.79
+step,change,flagged_interviews,interviews,pct
+0,Original team method,152,4393,3.46
+1,Add the last-quarter spending columns,380,4393,8.65
+2,Compare 3 months of spending with 3 months of income,2008,4393,45.71
+3,Use imputed income,1960,4736,41.39
+4,Apply survey weights,1960,4736,40.67
+5,Use all four 2023 interview files,7861,18814,40.79

@@ -65,7 +65,8 @@ Once the errors are fixed, the original rule flags about **41% of U.S. household
 
   The ACS counts 42.9 million burdened households in total; this project finds 42.2 million.
 - **Margins of error:** every share has a 95% interval from the survey's 44 replicate weights. The original project dropped these columns.
-- **Threshold sensitivity:** the overall rate moves from 40.8% at a 25% threshold to 15.5% at 50%. At the 50% threshold the same groups stand out: renters, people living alone, households with no earner and those aged 75 and over (`results/by_group.csv`).
+- **Threshold sensitivity:** the overall rate moves from 40.8% at a 25% threshold to 15.5% at 50%. At the 50% threshold the same groups stand out: renters, people living alone, households with no earner and those aged 75 and over (`results/estimates.csv`).
+- **Two independent implementations:** every estimate is computed in SQL and again in pandas, and the run stops if they disagree.
 - **Reproducibility:** `./run_all.sh` gives byte-identical output on every run.
 
 ## A measure I tested and rejected
@@ -90,17 +91,22 @@ That pattern matches two known features of this survey, not hardship: retirees s
 - This shows who is burdened, not why. It is descriptive, not causal.
 
 ## Pipeline
+The analysis runs in **SQL (DuckDB)**. A separate **pandas** version computes the same numbers independently, and the run stops if any figure differs.
+
 | Step | File | What it does |
 |---|---|---|
-| 1 | `src/build.py` | Reads the 4 BLS files and builds one row per interview: 3-month spending (CQ + PQ), HUD housing costs, groups, and the 44 replicate weights. Writes data checks. |
-| 2 | `src/reconcile_team.py` | Reproduces the original 3.46%, then applies each fix |
-| 3 | `src/analysis.py` | Weighted shares with 95% intervals, group breakdowns, spending profile, sensitivity and benchmarks |
-| 4 | `src/charts.py` | Charts |
-| – | `src/estimate.py` | Weighted estimates and replicate-weight standard errors |
+| 1 | `src/build.py` | Reads the 4 BLS files and builds one row per interview: 3-month spending (CQ + PQ), HUD housing costs, groups, and the 44 replicate weights |
+| 2 | `sql/01_measures.sql` | Burden ratios and flags per interview; reshapes the 44 replicate weights into long form (830,324 rows) with `UNPIVOT` |
+| 3 | `sql/02_estimates.sql` | Weighted shares for every measure and group, with standard errors from the replicate weights, all in SQL. Output: `results/estimates.csv` |
+| 4 | `sql/03_spending_profile.sql` | Spending shares and weighted median income (window functions) |
+| 5 | `sql/04_team_reconciliation.sql` | Reproduces the original 152 of 4,393 households, then applies each fix |
+| – | `src/run_sql.py` | Runs the SQL and checks all 72 group estimates, 8 headline figures, the spending profile and the 6 reconciliation steps against pandas |
+| – | `src/analysis.py`, `src/reconcile_team.py`, `src/estimate.py` | The independent pandas version (`results/pandas_check/`), plus validation against BLS, the ACS benchmark and threshold sensitivity |
+| 6 | `src/charts.py` | Charts, drawn from the SQL results |
 
 Setup: `python3 -m venv .venv && .venv/bin/pip install -r requirements.txt`, then download the data (see `data/README.md`) and run `./run_all.sh`.
 
-**Tools:** Python (pandas, NumPy, matplotlib), survey weighting, and replicate-weight variance estimation.
+**Tools:** SQL (DuckDB: CTEs, `UNPIVOT`, window functions, aggregate filters), Python (pandas, NumPy, matplotlib), survey weighting, and replicate-weight variance estimation.
 
 **Sources:**
 - [BLS Consumer Expenditure Survey public-use microdata](https://www.bls.gov/cex/pumd_data.htm)

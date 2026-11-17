@@ -70,5 +70,6 @@ f5 = flag(c, c.spend_total * 4, c.spend_housing_all * 4, essc * 4, c.income_befo
 record(5, "Use all four 2023 interview files (full year)", c, f5, weighted=True)
 
 out = pd.DataFrame(rows)
-out.to_csv(ROOT / "results" / "team_reconciliation.csv", index=False)
+(ROOT / "results" / "pandas_check").mkdir(parents=True, exist_ok=True)
+out.to_csv(ROOT / "results" / "pandas_check" / "team_reconciliation.csv", index=False)
 print(out.to_string(index=False))
