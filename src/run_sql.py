@@ -21,7 +21,24 @@ for f in sorted((ROOT / "sql").glob("*.sql")):
 
 for table in ["estimates", "spending_profile", "team_reconciliation", "sql_checks"]:
     con.table(table).df().to_csv(RES / f"{table}.csv", index=False)
+TAB = ROOT / "tableau"
+TAB.mkdir(exist_ok=True)
+for table, name in [("tableau_households", "households_2023"), ("tableau_estimates", "estimates_with_ci"),
+                    ("tableau_reconciliation", "team_reconciliation")]:
+    con.table(table).df().to_csv(TAB / f"{name}.csv", index=False)
 con.close()
+
+# The Tableau extract must reproduce the SQL estimates with the formula the dashboard will use:
+# SUM([Weight] * [Burdened (>30%)]) / SUM([Weight])
+hh = pd.read_csv(TAB / "households_2023.csv")
+est0 = pd.read_csv(RES / "estimates.csv").set_index(["measure", "group_var", "group"]).pct
+rate = lambda d, f: round(100 * (d.Weight * d[f]).sum() / d.Weight.sum(), 2)
+assert rate(hh, "Burdened (>30%)") == est0[("burdened", "all", "All households")]
+assert rate(hh, "Severely Burdened (>50%)") == est0[("severely_burdened", "all", "All households")]
+assert rate(hh[hh["Renter or Owner"] == "Renter"], "Burdened (>30%)") == est0[("burdened", "renter_or_owner", "Renters")]
+# the dashboard's threshold slider uses the ratio, so it must agree with the flag on every row
+assert ((hh["Housing Cost Share of Income"] > .30).astype(int) == hh["Burdened (>30%)"]).all()
+assert ((hh["Housing Cost Share of Income"] > .50).astype(int) == hh["Severely Burdened (>50%)"]).all()
 
 # ---------------------------------------------------------------- compare with pandas
 TOL = 0.011    # both sides round to 2 decimals
@@ -63,6 +80,7 @@ tr_pd = pd.read_csv(CHK / "team_reconciliation.csv")
 assert ((tr_sql.pct - tr_pd.pct).abs() <= TOL).all(), "team reconciliation differs"
 assert tr_sql.flagged_interviews[0] == 152 and tr_sql.interviews[0] == 4393, "SQL did not reproduce 152 of 4,393"
 
+print(f"Tableau extract: {len(hh)} rows; weighted rates reproduce the SQL estimates")
 print(f"SQL check: {len(m)} group estimates (share, SE, 95% interval), {len(pick)} headline figures, "
       f"the spending profile and all {len(tr_sql)} reconciliation steps match pandas")
 print(pd.read_csv(RES / "sql_checks.csv").to_string(index=False))

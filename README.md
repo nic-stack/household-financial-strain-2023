@@ -90,6 +90,9 @@ That pattern matches two known features of this survey, not hardship: retirees s
 - About 1.9% of interviews have no region (suppressed by BLS), so they appear in totals but not in the regional breakdown.
 - This shows who is burdened, not why. It is descriptive, not causal.
 
+## Dashboard
+An interactive Tableau Public dashboard is in progress. It is built from `tableau/`; the build plan is in [`tableau/TABLEAU_PLAN.md`](tableau/TABLEAU_PLAN.md).
+
 ## Pipeline
 The analysis runs in **SQL (DuckDB)**. A separate **pandas** version computes the same numbers independently, and the run stops if any figure differs.
 
@@ -100,9 +103,10 @@ The analysis runs in **SQL (DuckDB)**. A separate **pandas** version computes th
 | 3 | `sql/02_estimates.sql` | Weighted shares for every measure and group, with standard errors from the replicate weights, all in SQL. Output: `results/estimates.csv` |
 | 4 | `sql/03_spending_profile.sql` | Spending shares and weighted median income (window functions) |
 | 5 | `sql/04_team_reconciliation.sql` | Reproduces the original 152 of 4,393 households, then applies each fix |
+| 6 | `sql/05_tableau_extract.sql` | Data for the Tableau dashboard (`tableau/`). The run checks that the dashboard's weighted formula reproduces the SQL estimates |
 | – | `src/run_sql.py` | Runs the SQL and checks all 72 group estimates, 8 headline figures, the spending profile and the 6 reconciliation steps against pandas |
 | – | `src/analysis.py`, `src/reconcile_team.py`, `src/estimate.py` | The independent pandas version (`results/pandas_check/`), plus validation against BLS, the ACS benchmark and threshold sensitivity |
-| 6 | `src/charts.py` | Charts, drawn from the SQL results |
+| 7 | `src/charts.py` | Charts, drawn from the SQL results |
 
 Setup: `python3 -m venv .venv && .venv/bin/pip install -r requirements.txt`, then download the data (see `data/README.md`) and run `./run_all.sh`.
 

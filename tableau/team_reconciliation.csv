@@ -1,0 +1,7 @@
+Step,Change,Share Flagged
+0,Original team method,0.0346
+1,Add the last-quarter spending columns,0.0865
+2,Compare 3 months of spending with 3 months of income,0.4571
+3,Use imputed income,0.4139
+4,Apply survey weights,0.4067
+5,Use all four 2023 interview files,0.4079
