@@ -27,7 +27,7 @@ Format `Burden Rate` and `Housing Share of Spending` as percentages with 0 decim
 **4. Build three sheets (25 min):**
 - **Headline:** drag `Burden Rate` and `Households Burdened (M)` to Text. Title: `Households spending more than <Parameters.Threshold> of income on housing`.
 - **Who:** Rows `Income Group`, Columns `Burden Rate`, Mark Bar, show labels. Sort the rows manually from Lowest 20% to Highest 20%. Duplicate the sheet twice and swap in `Housing` and `Earners`, or just keep Income.
-- **Money:** Rows `Renter or Owner` and `Severely Burdened (>50%)`, Columns `Housing Share of Spending`, Mark Bar, labels on.
+- **Money:** first right-click `Severely Burdened (>50%)` → Convert to Dimension. Rows `Renter or Owner` and `Severely Burdened (>50%)`, Columns `Housing Share of Spending`, Mark Bar, labels on.
 
 **5. Dashboard (15 min).** Headline across the top, the slider next to it, Who on the left, Money on the right. Add a `Renter or Owner` filter and apply it to all sheets using this data source. Add a text box: "Source: BLS Consumer Expenditure Survey 2023 · code: github.com/nic-stack/household-financial-strain-2023".
 
