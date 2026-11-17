@@ -1,4 +1,43 @@
-# Tableau Public dashboard: build plan
+# Tableau Public dashboard
+
+## Quick version (about 1 hour), start here
+
+The margins of error and the "3.5% that wasn't" chart are already in the README as images. The dashboard only needs the interactive part.
+
+**1. Connect (5 min).** Open Tableau Public, then Text file → `households_2023.csv`.
+
+**2. Create one parameter (2 min).** `Threshold`: Float, range 0.25 to 0.50, step 0.05, current value 0.30, displayed as a percentage. Right-click it → Show Parameter.
+
+**3. Paste four calculated fields (10 min):**
+```
+// Burdened at Threshold
+IF [Housing Cost Share of Income] > [Threshold] THEN 1 ELSE 0 END
+
+// Burden Rate
+SUM([Weight] * [Burdened at Threshold]) / SUM([Weight])
+
+// Households Burdened (M)
+SUM([Weight] * [Burdened at Threshold]) / 4 / 1000000
+
+// Housing Share of Spending
+SUM([Weight] * [Spend: Housing]) / SUM([Weight] * [Spending incl. Principal (Annualized)])
+```
+Format `Burden Rate` and `Housing Share of Spending` as percentages with 0 decimals.
+
+**4. Build three sheets (25 min):**
+- **Headline:** drag `Burden Rate` and `Households Burdened (M)` to Text. Title: `Households spending more than <Parameters.Threshold> of income on housing`.
+- **Who:** Rows `Income Group`, Columns `Burden Rate`, Mark Bar, show labels. Sort the rows manually from Lowest 20% to Highest 20%. Duplicate the sheet twice and swap in `Housing` and `Earners`, or just keep Income.
+- **Money:** Rows `Renter or Owner` and `Severely Burdened (>50%)`, Columns `Housing Share of Spending`, Mark Bar, labels on.
+
+**5. Dashboard (15 min).** Headline across the top, the slider next to it, Who on the left, Money on the right. Add a `Renter or Owner` filter and apply it to all sheets using this data source. Add a text box: "Source: BLS Consumer Expenditure Survey 2023 · code: github.com/nic-stack/household-financial-strain-2023".
+
+**6. Check, then publish (5 min).** At 30% the headline must read **32%** and 42.2 million. At 50% it must read **15%**. Renters filtered: **54%**. Then File → Save to Tableau Public and send me the link.
+
+The full plan below adds a breakdown dropdown, the margins-of-error chart and more polish, if you want them later.
+
+---
+
+# Full plan
 
 **Goal:** one interactive dashboard that lets a non-technical reader answer "Who is housing-cost burdened, and how much does the definition matter?" It closes the project end to end: raw BLS files → SQL → tested results → dashboard.
 
